@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경제 퀴즈</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            margin: 0;
+        }
+        img {
+            height: 100px; /* 로고 높이 조정 */
+        }
+        .quiz-container {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px; /* 최대 너비 설정 */
+            margin: 20px auto; /* 중앙 정렬 */
+            display: none; /* 기본적으로 숨김 */
+        }
+        .question {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .options li:hover {
+            background: #0056b3; /* 마우스 오버 시 배경색 변화 */
+            color: white; /* 글자색 흰색으로 변화 */
+        }
+        .modal {
+            display: none; /* 기본적으로 숨김 */
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .all-questions {
+            display: none; /* 모든 문제 기본 숨김 */
+            padding: 20px;
+        }
+        .correct-answer {
+            font-weight: bold; /* 정답 볼드 처리 */
+            color: #007BFF; /* 정답 색상 처리 */
+            text-decoration: underline; /* 정답에 밑줄 추가 */
+        }
+    </style>
+    <script>
+        let currentQuestion = 0;
+        let score = 0; // 맞춘 문제 수
+        const questions = [
+            {
+                question: "1. 다음 중 GDP의 정의는 무엇인가요?",
+                options: [
+                    "A. 국내에서 생산된 모든 재화와 서비스의 총합",
+                    "B. 한 국가의 총 인구 수",
+                    "C. 특정 기간 동안의 정부 지출",
+                    "D. 중앙은행의 금리 정책"
+                ],
+                answer: "A"
+            },
+            {
+                question: "2. 다음 중 인플레이션의 원인은 무엇인가요?",
+                options: [
+                    "A. 수요 증가",
+                    "B. 공급 증가",
+                    "C. 세금 인하",
+                    "D. 외환 보유 증가"
+                ],
+                answer: "A"
+            },
+            {
+                question: "3. 다음 중 재정 정책의 주요 목적은 무엇인가요?",
+                options: [
+                    "A. 물가 안정",
+                    "B. 고용 증대",
+                    "C. 경제 성장 촉진",
+                    "D. 모든 항목이 맞음"
+                ],
+                answer: "D"
+            },
+            {
+                question: "4. 다음 중 중앙은행의 주요 기능은 무엇인가요?",
+                options: [
+                    "A. 금리 조정",
+                    "B. 통화 공급 조절",
+                    "C. 외환 관리",
+                    "D. 모든 항목이 맞음"
+                ],
+                answer: "D"
+            },
+            {
+                question: "5. 다음 중 경제 성장의 주요 지표는 무엇인가요?",
+                options: [
+                    "A. GDP 성장률",
+                    "B. 실업률",
+                    "C. 인플레이션률",
+                    "D. 재정적자"
+                ],
+                answer: "A"
+            },
+            {
+                question: "6. 다음 중 국제무역의 장점은 무엇인가요?",
+                options: [
+                    "A. 자원의 효율적 배분",
+                    "B. 시장 확대",
+                    "C. 경쟁 촉진",
+                    "D. 모든 항목이 맞음"
+                ],
+                answer: "D"
+            },
+            {
+                question: "7. 다음 중 경제적 효율성을 나타내는 지표는 무엇인가요?",
+                options: [
+                    "A. 생산성",
+                    "B. 소득 분배",
+                    "C. 소비자 잉여",
+                    "D. 모든 항목이 맞음"
+                ],
+                answer: "D"
+            },
+            {
+                question: "8. 다음 중 경상수지의 항목에 포함되지 않는 것은 무엇인가요?",
+                options: [
+                    "A. 상품수지",
+                    "B. 서비스수지",
+                    "C. 자본수지",
+                    "D. 소득수지"
+                ],
+                answer: "C"
+            },
+            {
+                question: "9. 다음 중 통화정책의 주된 수단은 무엇인가요?",
+                options: [
+                    "A. 정부 지출",
+                    "B. 세금 인상",
+                    "C. 금리 조정",
+                    "D. 무역 규제"
+                ],
+                answer: "C"
+            },
+            {
+                question: "10. 다음 중 시장의 공급법칙에 관한 설명으로 틀린 것은?",
+                options: [
+                    "A. 가격이 상승하면 공급이 증가한다.",
+                    "B. 가격이 하락하면 공급이 증가한다.",
+                    "C. 공급자는 가격 상승에 따라 더 많은 상품을 공급하려 한다.",
+                    "D. 공급은 가격과 반비례한다."
+                ],
+                answer: "B"
+            }
+        ];
+
+        function showQuestion(index) {
+            const quizContainer = document.getElementById('quiz-container');
+            const questionElement = document.getElementById('question');
+            const optionsElement = document.getElementById('options');
+
+            const current = questions[index];
+            questionElement.textContent = current.question;
+            optionsElement.innerHTML = current.options.map((option, i) => 
+                `<li onclick="selectOption('${String.fromCharCode(65 + i)}')">${option}</li>`
+            ).join('');
+        }
+
+        function selectOption(selected) {
+            const answer = questions[currentQuestion].answer;
+            const modal = document.getElementById('modal');
+            const resultText = document.getElementById('resultText');
+
+            if (selected === answer) {
+                score++; // 정답일 경우 점수 증가
+                resultText.textContent = '정답입니다!';
+            } else {
+                resultText.textContent = '오답입니다. 정답은 ' + answer + '입니다.';
+            }
+            modal.style.display = 'flex'; // 모달 표시
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion(currentQuestion);
+                document.getElementById('modal').style.display = 'none'; // 모달 숨김
+            } else {
+                showResults(); // 결과 보여주기
+                document.getElementById('modal').style.display = 'none'; // 마지막 모달 숨김
+                document.getElementById('quiz-container').style.display = 'none'; // 퀴즈 종료 시 컨테이너 숨김
+            }
+        }
+
+        function showResults() {
+            const allQuestionsContainer = document.getElementById('all-questions');
+            allQuestionsContainer.innerHTML = `
+                <h2>총 점수: ${score} / ${questions.length}</h2>
+                ${questions.map((q) => `
+                    <div>
+                        <div class="question">${q.question}</div>
+                        <ul class="options">
+                            ${q.options.map((option, i) => `
+                                <li ${option.startsWith(q.answer) ? 'style="font-weight:bold; color:#007BFF;"' : ''}>${option}</li>
+                            `).join('')}
+                        </ul>
+                        <p>정답: <span class="correct-answer">${q.answer}</span></p>
+                    </div>
+                `).join('')}
+            `;
+            allQuestionsContainer.style.display = 'block'; // 모든 문제 보여주기
+        }
+
+        window.onload = () => {
+            showQuestion(currentQuestion);
+            document.getElementById('quiz-container').style.display = 'block';
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <h1>경제 퀴즈</h1>
+        <img src="logo.png" alt="회사 로고">
+    </header>
+    
+    <div class="quiz-container" id="quiz-container">
+        <div class="question" id="question"></div>
+        <ul class="options" id="options"></ul>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <p id="resultText"></p>
+            <button onclick="nextQuestion()">확인</button>
+        </div>
+    </div>
+
+    <div class="all-questions" id="all-questions"></div>
+</body>
+</html>
